@@ -1,12 +1,10 @@
 ##### TO DO #####
 # Implement selenium explicit wait
 # Extract category number
-# Add date for the data
-
-
 
 
 from cgitb import text
+from datetime import date
 import time
 import csv
 from selenium import webdriver
@@ -16,7 +14,8 @@ from selenium.webdriver.common.by import By
 
 import csv 
 
-t = 3
+extract_date = date.today()
+t = 1
 
 driver = webdriver.Chrome(ChromeDriverManager().install()) #always re-install chromedriver because I couldn't make it work with a specified path
 html_page = driver.get("https://billetterie.psg.fr/fr/second/match-foot-masculin-paris-vs-nice/")
@@ -40,7 +39,7 @@ booking_accesses = driver.find_elements("xpath", '//button[@class="flex ai:cente
 Tickets = []
 # the loop sometimes breaks after a few categories 
 # probably a specific access or ticket badly handled in a cat after the 2nd one
-for i, booking_cat in enumerate(booking_cats):
+for i, booking_cat in enumerate(booking_cats[:2]):
 
     cat_accesses = []
     print(booking_cat.text)
@@ -64,7 +63,7 @@ for i, booking_cat in enumerate(booking_cats):
 
         for k in range(len(rangs)):
             try:    # the exception doesn't seem to pick up the error from selenium
-                Tickets.append([cat_number, rangs[k].text, quantities[k].text, prices[k].text])
+                Tickets.append([cat_number, extract_date, rangs[k].text, quantities[k].text, prices[k].text])
             except :
                 print("invalid ticket")
 
@@ -79,10 +78,10 @@ for i, booking_cat in enumerate(booking_cats):
 
 # creating the csv
 
-fields = ['Cat', 'Rank', 'Quant', 'Price'] 
+fields = ['Cat', 'Extraction_date', 'Rank', 'Quant', 'Price'] 
 rows = Tickets
     
-filename = "tickets_20_09.csv"
+filename = f"tickets_{extract_date}.csv"
     
 # writing to csv file 
 with open(filename, 'w', encoding="utf-8") as csvfile: 
